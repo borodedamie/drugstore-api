@@ -1,0 +1,14 @@
+{
+  "name": "drugstore-api",
+  "version": "1.0.0",
+  "description": "an online drugstore where users can search for drugs and the system would give results based on geolocation and drug availabilty",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oluborode Onaopemipo",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
