@@ -4,11 +4,18 @@
   "description": "an online drugstore where users can search for drugs and the system would give results based on geolocation and drug availabilty",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "serverstart": "DEBUG=drugstore-api:* npm run server"
   },
   "author": "Oluborode Onaopemipo",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
