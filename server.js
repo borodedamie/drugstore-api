@@ -6,9 +6,11 @@ const connectDB = require('./config/db')
 
 connectDB()
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+// Express Initializations
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+app.use('/api/users', require('./routes/userRoutes'))
 
 app.listen(port, () => {
   console.log(`drugstore app listening on port ${port}`)
