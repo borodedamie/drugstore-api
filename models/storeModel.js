@@ -35,7 +35,7 @@ const storeSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// storeSchema.index({ location: '2dsphere' });
+storeSchema.index({ location: '2dsphere' });
 
 const Store = mongoose.model('Store', storeSchema);
 

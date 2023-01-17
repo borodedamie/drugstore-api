@@ -27,7 +27,7 @@ exports.registerStore = async (req, res) => {
 
 exports.getStores = async (req, res) => {
     try {
-        const { address, distance } = req.query;
+        const { address, distance, drug } = req.query;
 
         const result = await geocoder.geocode(address);
 
@@ -36,7 +36,7 @@ exports.getStores = async (req, res) => {
             coordinates: [result[0].longitude, result[0].latitude]
         };
 
-        const stores = await Store.find({
+        let stores = await Store.find({
             location: {
                 $near: {
                     $geometry: {
@@ -47,13 +47,19 @@ exports.getStores = async (req, res) => {
                 }
             }
         });
-        
+
+        // filter stores based on availability of the drug
+        if(drug){
+            stores = stores.filter(store => {
+                return store.availability.some(item => item.drug.toString() === drug)
+            });
+        }
+
         res.status(200).json(stores);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
-
 
 exports.updateStore = async (req, res) => {
     try {
