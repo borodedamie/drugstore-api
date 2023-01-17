@@ -78,7 +78,7 @@ exports.updateStore = async (req, res) => {
     }
 };
 
-exports.deleteDrug = async (req, res) => {
+exports.deleteStore = async (req, res) => {
     try {
         const { id } = req.params;
 
