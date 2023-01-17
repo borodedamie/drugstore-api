@@ -7,7 +7,7 @@ exports.register = async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
-        const token = jwt.sign({ _id: user._id}, process.env.SECRET);
+        const token = jwt.sign({ _id: user._id }, process.env.SECRET);
         res.status(201).json({ token });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -26,7 +26,7 @@ exports.login = async (req, res) => {
         const isMatch = await user.comparePassword(password);
 
         if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid email or password'});
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
         const token = jwt.sign({ _id: user._id }, process.env.SECRET);
 
@@ -38,7 +38,7 @@ exports.login = async (req, res) => {
 
 exports.profile = async (req, res) => {
     try {
-        res.status(200).json( req.user )
+        res.status(200).json(req.user)
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -65,27 +65,31 @@ exports.passwordReset = async (req, res) => {
         }
 
         const token = crypto.randomBytes(20).toString('hex');
-        
+
         user.resetPasswordToken = token;
         user.resetPasswordExpires = Date.now() + 3600000;
         await user.save();
 
-        // const mailOptions = {
-        //     from: '',
-        //     to: email,
-        //     subject: 'Password reset request',
-        //     text: ''
-        // };
+        const mailOptions = {
+            from: 'odamie3@gmail.com',
+            to: email,
+            subject: 'Password reset request',
+            text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n 
+            Please click on the following link, or paste this into your browser to complete the process:\n\n 
+            ${req.protocol}://${req.get('host')}/api/users/reset/${token}\n\n 
+            If you did not request this, please ignore this email and your password will remain unchanged.\n`
+        };
 
-        // transporter.sendMail(mailOptions, function (error, response) {
-        //     if (error) {
-        //         console.error('there was an error: ', error);
-        //     } else {
-        //         console.log('here is the response: ', response);
-        //     }
-        // });
+        transporter.sendMail(mailOptions, function (err, response) {
+            if (err) {
+                console.error('there was an error: ', err);
+            } else {
+                console.log('here is the res: ', response);
+                res.status(200).json('recovery email sent');
+            }
+        });
 
-        res.status(200).json({ url: `${req.protocol}://${req.get('host')}/api/users/reset/${token}`})
+        res.status(200).json({ url: `${req.protocol}://${req.get('host')}/api/users/reset/${token}` })
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
