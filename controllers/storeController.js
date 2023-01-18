@@ -175,7 +175,7 @@ exports.removeDrug = async (req, res) => {
 
 exports.updateDrugAvailability = async (req, res) => {
     try {
-        const { storeId, drugId, availability } = req.body;
+        const { storeId, drugId, quantity } = req.body;
 
         // validating the store and drug id passed
         if (!mongoose.Types.ObjectId.isValid(storeId) || !mongoose.Types.ObjectId.isValid(drugId)) {
@@ -200,7 +200,7 @@ exports.updateDrugAvailability = async (req, res) => {
         }
 
         // updating the availability of the drug
-        await Store.updateOne({ _id: storeId, 'availability.drug': drugId }, { $set: { "availability.$.quantity": availability } });
+        await Store.updateOne({ _id: storeId, 'availability.drug': drugId }, { $set: { "availability.$.quantity": quantity } });
 
         res.status(200).json({ message: 'Availability updated successfully' });
     } catch (error) {

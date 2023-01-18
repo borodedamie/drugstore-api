@@ -1,4 +1,4 @@
-const mongoose = require('mongoose') 
+const mongoose = require('mongoose');
 
 const storeSchema = new mongoose.Schema({
     name: {
@@ -30,7 +30,8 @@ const storeSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: true,
-    }
+    },
+    socketId: String
 }, {
     timestamps: true
 });
