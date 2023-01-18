@@ -1,8 +1,10 @@
-const Store = require('../models/storeModel')
+const Store = require('../models/storeModel');
+const Drug = require('../models/drugModel');
 const geocoder = require('node-geocoder')({
     provider: 'opencage',
     apiKey: process.env.OPEN_CAGE
 });
+const mongoose = require('mongoose');
 
 exports.registerStore = async (req, res) => {
     try {
@@ -95,5 +97,113 @@ exports.deleteStore = async (req, res) => {
         res.status(200).json({ message: 'Store deleted successfully' })
     } catch (error) {
         res.status(404).json({ error: error.message });
+    }
+}
+
+exports.addDrug = async (req, res) => {
+    try {
+        const { storeId, drugId, quantity } = req.body;
+
+        //validating the store and drug id passed
+        if (!mongoose.Types.ObjectId.isValid(storeId) || !mongoose.Types.ObjectId.isValid(drugId)) {
+            return res.status(400).json({ error: "Invalid store or drug id" });
+        }
+
+        // checking if the store and drug exist
+        const store = await Store.findById(storeId);
+        if (!store) {
+            return res.status(404).json({ error: "Store not found" });
+        }
+
+        const drug = await Drug.findById(drugId);
+        if (!drug) {
+            return res.status(404).json({ error: "Drug not found" });
+        }
+
+        // checking if the drug is already in the store availability list
+        const drugAvailability = store.availability.find(item => item.drug.toString() === drugId);
+        if (drugAvailability) {
+            return res.status(400).json({ error: "Drug is already in the store availability list" });
+        }
+
+        // adding the drug to the store availability list
+        store.availability.push({ drug: drugId, quantity });
+
+        await store.save();
+        res.status(200).json({ message: 'Drug added to availability list successfully' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+
+}
+
+exports.removeDrug = async (req, res) => {
+    try {
+        const { storeId, drugId } = req.body;
+
+        //validating the store and drug id passed
+        if (!mongoose.Types.ObjectId.isValid(storeId) || !mongoose.Types.ObjectId.isValid(drugId)) {
+            return res.status(400).json({ error: "Invalid store or drug id" });
+        }
+
+        // checking if the store and drug exist
+        const store = await Store.findById(storeId);
+        if (!store) {
+            return res.status(404).json({ error: "Store not found" });
+        }
+
+        const drug = await Drug.findById(drugId);
+        if (!drug) {
+            return res.status(404).json({ error: "Drug not found" });
+        }
+
+        // checking if the drug is in the store availability list
+        const drugAvailability = store.availability.find(item => item.drug.toString() === drugId);
+        if (!drugAvailability) {
+            return res.status(404).json({ error: "Drug not found in the store availability list" });
+        }
+
+        // removing the drug from the store availability list
+        store.availability = store.availability.filter(item => item.drug.toString() !== drugId);
+        
+        await store.save();
+        res.status(200).json({ message: 'Drug removed from availability list successfully' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+}
+
+exports.updateDrugAvailability = async (req, res) => {
+    try {
+        const { storeId, drugId, availability } = req.body;
+
+        // validating the store and drug id passed
+        if (!mongoose.Types.ObjectId.isValid(storeId) || !mongoose.Types.ObjectId.isValid(drugId)) {
+            return res.status(400).json({ error: "Invalid store or drug id" });
+        }
+
+        // checking if the store and drug exist
+        const store = await Store.findById(storeId);
+        if (!store) {
+            return res.status(404).json({ error: "Store not found" });
+        }
+
+        const drug = await Drug.findById(drugId);
+        if (!drug) {
+            return res.status(404).json({ error: "Drug not found" });
+        }
+
+        // checking if the drug is in the store availability list
+        const drugAvailability = store.availability.find(item => item.drug.toString() === drugId);
+        if (!drugAvailability) {
+            return res.status(404).json({ error: "Drug not found in the store availability list" });
+        }
+
+        // updating the availability of the drug
+        await Store.updateOne({ _id: storeId, 'availability.drug': drugId }, { $set: { "availability.$.quantity": availability } });
+
+        res.status(200).json({ message: 'Availability updated successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 }
