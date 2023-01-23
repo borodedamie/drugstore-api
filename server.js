@@ -18,6 +18,7 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/stores', require('./routes/storeRoutes'));
 app.use('/api/drugs', require('./routes/drugRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/supports', require('./routes/supportRoutes'));
 
 global.socketIo.on('connection', (socket) => {
   console.log('New client connected');
