@@ -5,10 +5,15 @@ const dotenv = require('dotenv').config();
 const connectDB = require('./config/db');
 const server = require('http').createServer(app);
 const io = require('socket.io');
+const admin = require('firebase-admin');
+const serviceAccount = require('./utils/drugstore-geolocation-app-firebase-adminsdk-7wv0k-6870466546.json')
 
 global.socketIo = io(server);
-
 connectDB();
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 // Express Initializations
 app.use(express.json());

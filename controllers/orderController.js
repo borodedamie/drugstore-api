@@ -3,6 +3,17 @@ const { v4: uuidv4 } = require('uuid');
 const Store = require('../models/storeModel');
 const Drug = require('../models/drugModel');
 const socketIo = global.socketIo;
+const admin = require('firebase-admin');
+
+const sendPushNotification = async (token, payload) => {
+    try {
+        const response = await admin.messaging().sendToDevice(token, payload);
+
+        console.log('Push notification sent successfully:', response);
+    } catch (error) {
+        console.log('Error sending push notification:', error);
+    }
+};
 
 exports.createOrder = async (req, res) => {
     try {
@@ -55,9 +66,24 @@ exports.updateOrder = async (req, res) => {
     try {
         const { orderNumber, status } = req.body;
 
+        const order = await Order.findOne({ orderNumber });
+        const user = order.user;
+
         await Order.updateOne({ orderNumber }, { $set: { status } });
   
         socketIo.emit('order-status-updated', { orderNumber, status });
+
+        if (user.pushToken) {
+            const payload = {
+                notification: {
+                    title: 'Order status update',
+                    body: `Your order (${orderNumber}) status has been updated to ${status}.`,
+                    sound: 'default'
+                }
+            };
+
+            sendPushNotification(user.pushToken, payload);
+        }
 
         res.status(200).json({ message: 'Order status updated successfully' });
     } catch (err) {
