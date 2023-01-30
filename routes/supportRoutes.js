@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { createSupport, getSupports, updateSupport, deleteSupport } = require('../controllers/supportController');
+const { createSupport, getSupport, updateSupport, deleteSupport } = require('../controllers/supportController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/', protect, createSupport);
-router.get('/', getSupports);
+router.get('/:id', getSupport);
 router.put('/:id', protect, updateSupport);
 router.delete('/:id', deleteSupport);
 

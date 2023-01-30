@@ -19,10 +19,10 @@ const supportTicketSchema = new mongoose.Schema({
         enum: ['Open', 'In progress', 'Closed'],
         default: 'Open'
     },
-    // assignedTo: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User'
-    // },
+    assignedTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     dateClosed: {
         type: Date
     }

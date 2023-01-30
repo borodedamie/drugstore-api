@@ -2,14 +2,12 @@ const Support = require('../models/supportModel')
 
 exports.createSupport = async (req, res) => {
     try {
-        const { subject, message, status, dateClosed } = req.body;
+        const { subject, message } = req.body;
 
         const support = new Support({
             customer: req.user,
             subject,
             message, 
-            status,
-            dateClosed
         });
         await support.save();
 
@@ -19,11 +17,12 @@ exports.createSupport = async (req, res) => {
     }
 }
 
-exports.getSupports = async (req, res) => {
+exports.getSupport = async (req, res) => {
     try {
-        const supports = await Support.find();
+        const support = await Support.findById(req.params.id);
+        if (!support) return res.status(404).json({ message: 'Support ticket not found'});
 
-        res.status(200).json(supports);
+        res.status(200).json(support);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -31,9 +30,12 @@ exports.getSupports = async (req, res) => {
 
 exports.updateSupport = async (req, res) => {
     try {
-        const support = await Support.findByIdAndUpdate(req.params.id, req.body, {
-            new: true
-        });
+        const { status, assignedTo } = req.body;
+
+        const dateClosed = (status === 'Closed') ? Date.now() : undefined;
+        const support = await Support.findByIdAndUpdate(req.params.id, { status, assignedTo, dateClosed }, { new: true });
+
+        if (!support) return res.status(404).json({ message: 'Support ticket not found' });
 
         res.status(200).json(support);
     } catch (error) {
