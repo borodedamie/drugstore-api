@@ -7,6 +7,9 @@ const server = require('http').createServer(app);
 const io = require('socket.io');
 const admin = require('firebase-admin');
 const serviceAccount = require('./utils/drugstore-geolocation-app-firebase-adminsdk-7wv0k-6870466546.json')
+const session = require('express-session');
+const passport = require('passport');
+const FacebookStrategy = require('passport-facebook').Strategy;
 
 global.socketIo = io(server);
 connectDB();
@@ -15,9 +18,54 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+app.use(
+  session({
+    secret: 'swewewh1213ygguy',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Set to `true` if using HTTPS
+  })
+);
+
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1) // trust first proxy
+  sess.cookie.secure = true // serve secure cookies
+}
+
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_APP_ID,
+  clientSecret: process.env.FACEBOOK_APP_SECRET,
+  callbackURL: "http://localhost:3000/api/users/auth/facebook/callback"
+}, function (accessToken, refreshToken, profile, cb) {
+  const user = {
+    profile: profile,
+    accessToken: accessToken,
+    refreshToken: refreshToken
+  };
+  return cb(null, user);
+}))
+
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
+
+
 // Express Initializations
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.get('/', (req, res) => {
+  // Access session data
+  const { views } = req.session;
+  req.session.views = views ? views + 1 : 1;
+
+  res.send(`Number of views: ${req.session.views}`);
+});
 
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/stores', require('./routes/storeRoutes'));

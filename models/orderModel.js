@@ -34,12 +34,12 @@ const orderSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['processing', 'shipped', 'delivered'],
+        enum: [ 'processing', 'shipped', 'delivered' ],
         default: 'processing'
     },
     deliveryOption: {
         type: String,
-        enum: ['same day', 'next day', 'scheduled'],
+        enum: [ 'same day', 'next day', 'scheduled' ],
         default: 'same day'
     },
     deliveryAddress: {
@@ -52,7 +52,7 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['cash', 'card', 'online']
+        enum: [ 'cash', 'card' ]
     },
     date: {
         type: Date,

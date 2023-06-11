@@ -16,7 +16,7 @@ const supportTicketSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Open', 'In progress', 'Closed'],
+        enum: [ 'Open', 'In progress', 'Closed' ],
         default: 'Open'
     },
     assignedTo: {
