@@ -13,8 +13,6 @@ exports.protect = asyncHandler(async (req, res, next) => {
             // Verify token
             const decoded = jwt.verify(token, process.env.SECRET);
 
-            console.log(decoded);
-
             // Get user from the token
             req.user = await User.findById(decoded._id).select('-password');
 
@@ -23,9 +21,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
             res.status(401);
             throw new Error('Not Authorized');
         }
-    }
-
-    if (!token && req.user) {
+    } else if (req.user && req.user.provider === 'facebook') {
         // User is authenticated through Facebook
         next();
     } else {
