@@ -10,6 +10,8 @@ const serviceAccount = require('./utils/drugstore-geolocation-app-firebase-admin
 const session = require('express-session');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
+const GoogleStrategy = require('passport-google-oidc').Strategy;
+const User = require('./models/userModel');
 
 global.socketIo = io(server);
 connectDB();
@@ -38,6 +40,7 @@ passport.use(new FacebookStrategy({
   callbackURL: "http://localhost:3000/api/users/auth/facebook/callback"
 }, function (accessToken, refreshToken, profile, cb) {
   const user = {
+    id: profile.id,
     profile: profile,
     accessToken: accessToken,
     refreshToken: refreshToken
@@ -45,14 +48,21 @@ passport.use(new FacebookStrategy({
   return cb(null, user);
 }))
 
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/api/users/auth/google/callback"
+},
+  function (accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+
 passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
-
-passport.deserializeUser(function (user, done) {
-  done(null, user);
-});
-
 
 // Express Initializations
 app.use(express.json());

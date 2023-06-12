@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const findOrCreate = require('mongoose-findorcreate');
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -24,14 +25,15 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order'
     }],
-    role:{
+    role: {
         type: String,
         default: "user",
         enum: ["user", "admin"]
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
-    pushToken: String
+    pushToken: String,
+    googleId: String,
 }, {
     timestamps: true
 });
@@ -53,6 +55,8 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePassword = function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
+
+userSchema.plugin(findOrCreate);
 
 const User = mongoose.model('User', userSchema);
 
