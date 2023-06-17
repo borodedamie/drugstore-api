@@ -6,6 +6,19 @@ const geocoder = require('node-geocoder')({
 });
 const mongoose = require('mongoose');
 
+async function reverseGeocode(latitude, longitude) {
+    const res = await geocoder.reverse({ lat: latitude, lon: longitude });
+    return res[0].formattedAddress;
+};
+
+async function geocodeAddress(address) {
+    const res = await geocoder.geocode(address);
+    return {
+        latitude: res[0].latitude,
+        longitude: res[0].longitude
+    };
+};
+
 exports.registerStore = async (req, res) => {
     try {
         const { name, address, phone } = req.body;
@@ -29,29 +42,35 @@ exports.registerStore = async (req, res) => {
 
 exports.getStores = async (req, res) => {
     try {
-        const { address, distance, drug } = req.query;
+        const { address, distance, drug, latitude, longitude } = req.query;
 
-        const result = await geocoder.geocode(address);
-
-        const location = {
-            type: 'Point',
-            coordinates: [result[0].longitude, result[0].latitude]
-        };
+        let location;
+        if (latitude && longitude) {
+            location = {
+                type: 'Point',
+                coordinates: [longitude, latitude]
+            };
+        } else if (address) {
+            const result = await geocodeAddress(address);
+            location = {
+                type: 'Point',
+                coordinates: [result.longitude, result.latitude]
+            };
+        } else {
+            return res.status(400).json({ error: 'Either address or latitude and longitude must be provided' });
+        }
 
         let stores = await Store.find({
             location: {
                 $near: {
-                    $geometry: {
-                        type: 'Point',
-                        coordinates: [result[0].longitude, result[0].latitude]
-                    },
+                    $geometry: location,
                     $maxDistance: distance
                 }
             }
         });
 
         // filter stores based on availability of the drug
-        if(drug){
+        if (drug) {
             stores = stores.filter(store => {
                 return store.availability.some(item => item.drug.toString() === drug)
             });
@@ -98,7 +117,7 @@ exports.deleteStore = async (req, res) => {
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
-}
+}; 
 
 exports.addDrug = async (req, res) => {
     try {
@@ -135,7 +154,7 @@ exports.addDrug = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 
-}
+};
 
 exports.removeDrug = async (req, res) => {
     try {
@@ -165,13 +184,13 @@ exports.removeDrug = async (req, res) => {
 
         // removing the drug from the store availability list
         store.availability = store.availability.filter(item => item.drug.toString() !== drugId);
-        
+
         await store.save();
         res.status(200).json({ message: 'Drug removed from availability list successfully' });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
-}
+};
 
 exports.updateDrugAvailability = async (req, res) => {
     try {
@@ -206,4 +225,4 @@ exports.updateDrugAvailability = async (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-}
+};

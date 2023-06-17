@@ -82,6 +82,7 @@ app.use('/api/stores', require('./routes/storeRoutes'));
 app.use('/api/drugs', require('./routes/drugRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/supports', require('./routes/supportRoutes'));
+app.use('/api/carts', require('./routes/cartRoutes'));
 
 global.socketIo.on('connection', (socket) => {
   console.log('New client connected');
