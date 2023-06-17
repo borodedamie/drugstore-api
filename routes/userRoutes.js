@@ -1,14 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, profile, update, passwordReset } = require('../controllers/userController');
+const { register, login, profile, update, passwordReset, forgotPassword, resetPassword } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 const passport = require('passport');
 
-router.post('/', register)
-router.post('/login', login)
-router.get('/profile', protect, profile)
-router.put('/update', protect, update)
-router.post('/password-reset', passwordReset)
+router.post('/', register);
+router.post('/login', login);
+router.get('/profile', protect, profile);
+router.put('/update', protect, update);
+router.post('/request-password-reset', protect, forgotPassword);
+router.patch('/password-reset', resetPassword);
+// router.post('/password-reset', passwordReset)
 
 router.get('/auth/facebook', passport.authenticate('facebook'));
 router.get('/auth/facebook/callback',
@@ -26,4 +28,4 @@ router.get('/auth/google/callback',
         res.redirect('/');
     });
 
-module.exports = router
+module.exports = router;
