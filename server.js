@@ -12,6 +12,7 @@ const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oidc').Strategy;
 const User = require('./models/userModel');
+const { swaggerDocs } = require('./utils/swagger');
 
 global.socketIo = io(server);
 connectDB();
@@ -22,7 +23,7 @@ admin.initializeApp({
 
 app.use(
   session({
-    secret: 'swewewh1213ygguy',
+    secret: process.env.EXPRESS_SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }, // Set to `true` if using HTTPS
@@ -95,4 +96,6 @@ global.socketIo.on('connection', (socket) => {
 
 app.listen(port, () => {
   console.log(`drugstore app listening on port ${port}`);
+
+  swaggerDocs(app, port);
 });

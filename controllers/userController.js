@@ -1,8 +1,6 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const { transporter } = require('../config/nodemailer');
-const bcrypt = require('bcrypt');
 
 exports.register = async (req, res) => {
     try {
