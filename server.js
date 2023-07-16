@@ -5,7 +5,7 @@ const dotenv = require('dotenv').config();
 const connectDB = require('./config/db');
 const server = require('http').createServer(app);
 const io = require('socket.io');
-const admin = require('firebase-admin');
+// const admin = require('firebase-admin');
 // const serviceAccount = require('./utils/drugstore-geolocation-app-firebase-adminsdk-7wv0k-6870466546.json')
 const session = require('express-session');
 const passport = require('passport');
@@ -20,6 +20,11 @@ connectDB();
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount)
 // });
+
+var sess = {
+  secret: process.env.EXPRESS_SESSION_SECRET_KEY,
+  cookie: {}
+}
 
 app.use(
   session({
@@ -68,6 +73,7 @@ passport.serializeUser(function (user, done) {
 // Express Initializations
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(session(sess))
 
 // Routes
 app.get('/', (req, res) => {
