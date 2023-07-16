@@ -6,7 +6,7 @@ const connectDB = require('./config/db');
 const server = require('http').createServer(app);
 const io = require('socket.io');
 const admin = require('firebase-admin');
-const serviceAccount = require('./utils/drugstore-geolocation-app-firebase-adminsdk-7wv0k-6870466546.json')
+// const serviceAccount = require('./utils/drugstore-geolocation-app-firebase-adminsdk-7wv0k-6870466546.json')
 const session = require('express-session');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
@@ -17,9 +17,9 @@ const { swaggerDocs } = require('./utils/swagger');
 global.socketIo = io(server);
 connectDB();
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
 
 app.use(
   session({
