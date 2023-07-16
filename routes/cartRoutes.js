@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 
 /**
 * @openapi
-* /api/carts:
+* /carts:
 *   get:
 *     tags:
 *       - Cart
@@ -29,7 +29,7 @@ const { protect } = require('../middleware/authMiddleware');
 *                 error:
 *                   type: string
 *
-* /api/carts/add-to-cart:
+* /carts/add-to-cart:
 *   post:
 *     tags:
 *       - Cart
@@ -91,7 +91,7 @@ const { protect } = require('../middleware/authMiddleware');
 *                 error:
 *                   type: string
 *
-* /api/carts/remove-from-cart:
+* /carts/remove-from-cart:
 *   post:
 *     tags:
 *       - Cart

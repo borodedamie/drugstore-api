@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 
 /**
 * @openapi
-* /api/payments:
+* /payments:
 *   post:
 *     tags:
 *       - Payment
@@ -48,7 +48,7 @@ const { protect } = require('../middleware/authMiddleware');
 *       400:
 *         description: Bad Request.
 *
-* /api/payments/validate:
+* /payments/validate:
 *   post:
 *     tags:
 *       - Payment

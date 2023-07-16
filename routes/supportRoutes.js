@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 
 /**
 * @openapi
-* /api/supports:
+* /supports:
 *   post:
 *     tags:
 *       - Support
@@ -46,7 +46,7 @@ const { protect } = require('../middleware/authMiddleware');
 *                 error:
 *                   type: string
 *
-* /api/supports/{id}:
+* /supports/{id}:
 *   get:
 *     tags:
 *       - Support

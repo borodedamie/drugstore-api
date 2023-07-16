@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 
 /**
 * @openapi
-* /api/orders/create-order:
+* /orders/create-order:
 *   post:
 *     tags:
 *       - Order
@@ -43,7 +43,7 @@ const { protect } = require('../middleware/authMiddleware');
 *       400:
 *         description: Bad Request
 *
-* /api/orders:
+* /orders:
 *   get:
 *     tags:
 *       - Order
@@ -70,7 +70,7 @@ const { protect } = require('../middleware/authMiddleware');
 *                 error:
 *                   type: string
 *
-* /api/orders/{id}:
+* /orders/{id}:
 *   put:
 *     tags:
 *       - Order

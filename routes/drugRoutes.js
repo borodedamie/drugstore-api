@@ -4,7 +4,7 @@ const { createDrug, getDrugs, getDrug, updateDrug, deleteDrug } = require('../co
 
 /**
 * @openapi
-* /api/drugs:
+* /drugs:
 *   get:
 *     tags:
 *       - Drug
@@ -69,7 +69,7 @@ const { createDrug, getDrugs, getDrug, updateDrug, deleteDrug } = require('../co
 *                 error:
 *                   type: string
 *
-* /api/drugs/{id}:
+* /drugs/{id}:
 *   get:
 *     tags:
 *       - Drug

@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 
 /**
 * @openapi
-* /api/stores/register:
+* /stores/register:
 *   post:
 *     tags:
 *       - Store
@@ -33,7 +33,7 @@ const { protect } = require('../middleware/authMiddleware');
 *       400:
 *         description: Bad Request.
 *
-* /api/stores:
+* /stores:
 *   get:
 *     tags:
 *       - Store
@@ -65,7 +65,7 @@ const { protect } = require('../middleware/authMiddleware');
 *       400:
 *         description: Bad Request.
 *
-* /api/stores/update-drug-availability:
+* /stores/update-drug-availability:
 *   post:
 *     tags:
 *       - Drug Availability
@@ -98,7 +98,7 @@ const { protect } = require('../middleware/authMiddleware');
 *       404:
 *         description: Store not found, Drug not found, or Drug not found in the store availability list
 *
-* /api/stores/add-drug:
+* /stores/add-drug:
 *   post:
 *     tags:
 *       - Drug Availability
@@ -124,7 +124,7 @@ const { protect } = require('../middleware/authMiddleware');
 *       404:
 *         description: Store not found or Drug not found
 *
-* /api/stores/remove-drug:
+* /stores/remove-drug:
 *   delete:
 *     tags:
 *       - Drug Availability

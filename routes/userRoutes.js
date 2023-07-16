@@ -6,7 +6,7 @@ const passport = require('passport');
 
 /**
 * @openapi
-* /api/users/register:
+* /users/register:
 *   post:
 *     tags:
 *       - Register
@@ -32,7 +32,7 @@ const passport = require('passport');
 *       400:
 *         description: Bad Request
 *
-* /api/users/login:
+* /users/login:
 *   post:
 *     tags:
 *       - Login
@@ -60,7 +60,7 @@ const passport = require('passport');
 *       401:
 *         description: Invalid email or password, or User not found.
 *
-* /api/users/profile:
+* /users/profile:
 *   post:
 *     tags:
 *       - Profile
@@ -92,7 +92,7 @@ const passport = require('passport');
 *       401:
 *         description: Not authorized, no token.
 *
-* /api/users/update:
+* /users/update:
 *   put:
 *     tags:
 *       - Profile
@@ -118,7 +118,7 @@ const passport = require('passport');
 *       400:
 *         description: Bad Request.
 *
-* /api/users/request-password-reset:
+* /users/request-password-reset:
 *   post:
 *     tags:
 *       - Reset Password
@@ -145,7 +145,7 @@ const passport = require('passport');
 *       401:
 *         description: User not found.
 *
-* /api/users/password-reset:
+* /users/password-reset:
 *   patch:
 *     tags:
 *       - Reset Password
@@ -176,7 +176,7 @@ const passport = require('passport');
 *       401:
 *         description: User not found or Incorrect OTP.
 *
-* /api/users/auth/facebook:
+* /users/auth/facebook:
 *   get:
 *     tags:
 *       - Login
@@ -187,7 +187,7 @@ const passport = require('passport');
 *       400:
 *         description: Bad Request.
 *
-* /api/users/auth/google:
+* /users/auth/google:
 *   get:
 *     tags:
 *       - Login

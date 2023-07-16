@@ -78,13 +78,13 @@ app.get('/', (req, res) => {
   res.send(`Number of views: ${req.session.views}`);
 });
 
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/stores', require('./routes/storeRoutes'));
-app.use('/api/drugs', require('./routes/drugRoutes'));
-app.use('/api/orders', require('./routes/orderRoutes'));
-app.use('/api/supports', require('./routes/supportRoutes'));
-app.use('/api/carts', require('./routes/cartRoutes'));
-app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/users', require('./routes/userRoutes'));
+app.use('/stores', require('./routes/storeRoutes'));
+app.use('/drugs', require('./routes/drugRoutes'));
+app.use('/orders', require('./routes/orderRoutes'));
+app.use('/supports', require('./routes/supportRoutes'));
+app.use('/carts', require('./routes/cartRoutes'));
+app.use('/payments', require('./routes/paymentRoutes'));
 
 global.socketIo.on('connection', (socket) => {
   console.log('New client connected');
