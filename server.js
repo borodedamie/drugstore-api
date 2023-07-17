@@ -13,6 +13,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oidc').Strategy;
 const User = require('./models/userModel');
 const { swaggerDocs } = require('./utils/swagger');
+const cors = require('cors');
 
 global.socketIo = io(server);
 connectDB();
@@ -74,6 +75,8 @@ passport.serializeUser(function (user, done) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session(sess))
+
+app.use(cors())
 
 // Routes
 app.get('/', (req, res) => {
