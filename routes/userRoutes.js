@@ -23,9 +23,12 @@ const passport = require('passport');
 *                 format: email
 *               password:
 *                 type: string
+*               phone:
+*                 type: string
 *             required:
 *               - email
 *               - password
+*               - phone
 *     responses:
 *       201:
 *         description: Token gets generated
