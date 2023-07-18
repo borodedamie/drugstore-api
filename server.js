@@ -44,7 +44,7 @@ if (app.get('env') === 'production') {
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: "http://localhost:3000/api/users/auth/facebook/callback"
+  callbackURL: "http://localhost:5000/api/users/auth/facebook/callback"
 }, function (accessToken, refreshToken, profile, cb) {
   const user = {
     id: profile.id,
@@ -58,7 +58,7 @@ passport.use(new FacebookStrategy({
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/api/users/auth/google/callback"
+  callbackURL: "http://localhost:5000/api/users/auth/google/callback"
 },
   function (accessToken, refreshToken, profile, cb) {
     User.findOrCreate({ googleId: profile.id }, function (err, user) {

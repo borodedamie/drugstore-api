@@ -215,16 +215,16 @@ router.get('/auth/facebook', passport.authenticate('facebook'));
 router.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: '/api/users/auth/facebook' }),
     function (req, res) {
-        res.redirect('/');
+        res.redirect('https://drugstore-geolocation-app.web.app/locate-pharmacy');
     });
 router.get('/auth/google',
     passport.authenticate('google', { scope: ['profile'] }));
 
 router.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
+    passport.authenticate('google', { failureRedirect: '/api/users/auth/google' }),
     function (req, res) {
         // Successful authentication, redirect home.
-        res.redirect('/');
+        res.redirect('https://drugstore-geolocation-app.web.app/locate-pharmacy');
     });
 
 module.exports = router;
