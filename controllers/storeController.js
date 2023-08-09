@@ -1,33 +1,26 @@
 const Store = require('../models/storeModel');
 const Drug = require('../models/drugModel');
-const geocoder = require('node-geocoder')({
-    provider: 'opencage',
-    apiKey: process.env.OPEN_CAGE
-});
 const mongoose = require('mongoose');
-
-async function reverseGeocode(latitude, longitude) {
-    const res = await geocoder.reverse({ lat: latitude, lon: longitude });
-    return res[0].formattedAddress;
-};
-
-async function geocodeAddress(address) {
-    const res = await geocoder.geocode(address);
-    return {
-        latitude: res[0].latitude,
-        longitude: res[0].longitude
-    };
-};
+const {Client} = require('@googlemaps/google-maps-services-js');
+const client = new Client({});
 
 exports.registerStore = async (req, res) => {
     try {
         const { name, address, phone } = req.body;
 
-        const result = await geocoder.geocode(address);
+        const result = await client.geocode({
+            params: {
+                address: address,
+                key: process.env.GOOGLE_MAPS_API_KEY,
+            },
+        });
 
         const location = {
             type: 'Point',
-            coordinates: [result[0].longitude, result[0].latitude]
+            coordinates: [
+                result.data.results[0].geometry.location.lng,
+                result.data.results[0].geometry.location.lat,
+            ],
         };
 
         const store = new Store({ name, address, phone, location });
@@ -42,39 +35,19 @@ exports.registerStore = async (req, res) => {
 
 exports.getStores = async (req, res) => {
     try {
-        const { address, distance, drug, latitude, longitude } = req.query;
+        const { drug } = req.query;
 
-        let location;
-        if (latitude && longitude) {
-            location = {
-                type: 'Point',
-                coordinates: [longitude, latitude]
-            };
-        } else if (address) {
-            const result = await geocodeAddress(address);
-            location = {
-                type: 'Point',
-                coordinates: [result.longitude, result.latitude]
-            };
-        } else {
-            return res.status(400).json({ error: 'Either address or latitude and longitude must be provided' });
+        if (!drug) {
+            return res.status(400).json({ error: 'Drug must be provided' });
         }
 
         let stores = await Store.find({
-            location: {
-                $near: {
-                    $geometry: location,
-                    $maxDistance: distance
+            availability: {
+                $elemMatch: {
+                    drug: drug
                 }
             }
         });
-
-        // filter stores based on availability of the drug
-        if (drug) {
-            stores = stores.filter(store => {
-                return store.availability.some(item => item.drug.toString() === drug)
-            });
-        }
 
         res.status(200).json(stores);
     } catch (err) {
@@ -82,17 +55,26 @@ exports.getStores = async (req, res) => {
     }
 };
 
+
 exports.updateStore = async (req, res) => {
     try {
         const { id } = req.params;
 
         const { name, address, phone } = req.body;
 
-        const result = await geocoder.geocode(address);
+        const result = await client.geocode({
+            params: {
+                address: address,
+                key: process.env.GOOGLE_MAPS_API_KEY,
+            },
+        });
 
         const location = {
             type: 'Point',
-            coordinates: [result[0].longitude, result[0].latitude]
+            coordinates: [
+                result.data.results[0].geometry.location.lng,
+                result.data.results[0].geometry.location.lat,
+            ],
         };
 
         const store = await Store.findByIdAndUpdate(id, { name, address, phone, location }, { new: true });
