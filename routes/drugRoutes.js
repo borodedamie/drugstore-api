@@ -176,7 +176,8 @@ const { createDrug, getDrugs, getDrug, updateDrug, deleteDrug } = require('../co
 *                   type: string
 */
 
-router.route('/').get(getDrugs).post(createDrug);
+router.get('/store/:storeId', getDrugs)
+router.post('/', createDrug);
 router.route('/:id').get(getDrug).put(updateDrug).delete(deleteDrug);
 
 module.exports = router;

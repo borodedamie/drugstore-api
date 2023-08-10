@@ -19,7 +19,8 @@ exports.createDrug = async (req, res) => {
 
 exports.getDrugs = async (req, res) => {
     try {
-        const drugs = await Drug.find().populate('store');
+        const storeId = req.params.storeId;
+        const drugs = await Drug.find({ store: storeId }).populate('store');
 
         res.status(200).json(drugs);
     } catch (err) {
