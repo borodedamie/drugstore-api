@@ -8,10 +8,10 @@ exports.registerStore = async (req, res) => {
     try {
         const { name, address, phone } = req.body;
 
-        // Check if a store with the same name already exists
-        const existingStore = await Store.findOne({ name });
+        // Check if a store with the same address already exists
+        const existingStore = await Store.findOne({ address });
         if (existingStore) {
-            return res.status(400).json({ error: 'A store with this name already exists' });
+            return res.status(400).json({ error: 'A store with this address already exists' });
         }
 
         const result = await client.geocode({
