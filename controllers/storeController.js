@@ -48,10 +48,18 @@ exports.getStores = async (req, res) => {
             return res.status(400).json({ error: 'Drug must be provided' });
         }
 
+        // Find the drug by its name
+        const drugDoc = await Drug.findOne({ name: drug });
+
+        if (!drugDoc) {
+            return res.status(404).json({ error: 'Drug not found' });
+        }
+
+        // Find stores that have the drug in stock
         let stores = await Store.find({
             availability: {
                 $elemMatch: {
-                    drug: drug
+                    drug: drugDoc._id
                 }
             }
         });
