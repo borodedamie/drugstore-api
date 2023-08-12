@@ -152,7 +152,7 @@ const { protect } = require('../middleware/authMiddleware');
 router.post('/register', registerStore);
 router.get('/', getStores);
 router.patch('/update-drug-availability', protect, updateDrugAvailability)
-router.post('/add-drug', protect, addDrug)
-router.delete('/remove-drug', protect, removeDrug)
+router.post('/add-drug', addDrug)
+router.delete('/remove-drug', removeDrug)
 
 module.exports = router;

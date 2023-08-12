@@ -48,8 +48,8 @@ exports.getStores = async (req, res) => {
             return res.status(400).json({ error: 'Drug must be provided' });
         }
 
-        // Find the drug by its name
-        const drugDoc = await Drug.findOne({ name: drug });
+        // Find the drug by its name using a case-insensitive regular expression
+        const drugDoc = await Drug.findOne({ name: { $regex: new RegExp(`^${drug}$`, 'i') } });
 
         if (!drugDoc) {
             return res.status(404).json({ error: 'Drug not found' });
