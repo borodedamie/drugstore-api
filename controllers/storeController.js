@@ -48,21 +48,22 @@ exports.getStores = async (req, res) => {
             return res.status(400).json({ error: 'Drug must be provided' });
         }
 
-        // Find the drug by its name using a case-insensitive regular expression
-        const drugDoc = await Drug.findOne({ name: { $regex: new RegExp(`^${drug}$`, 'i') } });
-
-        if (!drugDoc) {
-            return res.status(404).json({ error: 'Drug not found' });
-        }
-
-        // Find stores that have the drug in stock
-        let stores = await Store.find({
-            availability: {
-                $elemMatch: {
-                    drug: drugDoc._id
+        // Use an aggregation pipeline to find stores that have the drug in stock
+        let stores = await Store.aggregate([
+            {
+                $lookup: {
+                    from: 'drugs',
+                    localField: 'availability.drug',
+                    foreignField: '_id',
+                    as: 'drugs'
+                }
+            },
+            {
+                $match: {
+                    'drugs.name': { $regex: new RegExp(`^${drug}$`, 'i') }
                 }
             }
-        });
+        ]);
 
         res.status(200).json(stores);
     } catch (err) {
