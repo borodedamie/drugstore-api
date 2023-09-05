@@ -1,8 +1,9 @@
 const Store = require('../models/storeModel');
 const Drug = require('../models/drugModel');
 const mongoose = require('mongoose');
-const {Client} = require('@googlemaps/google-maps-services-js');
+const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
+const fetch = require('node-fetch');
 
 exports.registerStore = async (req, res) => {
     try {
@@ -115,7 +116,7 @@ exports.deleteStore = async (req, res) => {
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
-}; 
+};
 
 exports.addDrug = async (req, res) => {
     try {
@@ -220,6 +221,23 @@ exports.updateDrugAvailability = async (req, res) => {
         await Store.updateOne({ _id: storeId, 'availability.drug': drugId }, { $set: { "availability.$.quantity": quantity } });
 
         res.status(200).json({ message: 'Availability updated successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+exports.getETA = async (req, res) => {
+    try {
+        const { origin, destination } = req.query;
+
+        // construct google maps directions API request URL
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        res.json(data);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
