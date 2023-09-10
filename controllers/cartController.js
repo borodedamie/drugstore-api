@@ -3,7 +3,12 @@ const Store = require('../models/storeModel');
 
 exports.getCartItems = async (req, res) => {
     try {
-        const userId = req.user._id; // assuming the user is authenticated and their ID is available on the req.user object
+        // Check if user is authenticated
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
+
+        const userId = req.user._id;
 
         const cart = await Cart.findOne({ user: userId }).populate('items.drug');
 
