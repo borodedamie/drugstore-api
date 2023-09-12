@@ -1,14 +1,26 @@
 const Drug = require('../models/drugModel')
 const Store = require('../models/storeModel');
+const path = require('path')
 
 exports.createDrug = async (req, res) => {
     try {
-        const { name, dosage, price, store } = req.body;
+        const { name, dosage, price, quantityPerSachet, generalUsage, store } = req.body;
 
         const storeDB = await Store.findOne({ name: store })
 
-        const drug = new Drug({ name, dosage, price, store: storeDB });
+        const url = new URL(req.file.path, `${req.protocol}://${req.get('host')}`).href
 
+        const drug = new Drug({
+            name: name,
+            dosage: dosage,
+            price: price,
+            quantityPerSachet: quantityPerSachet,
+            generalUsage: generalUsage,
+            store: storeDB,
+            drugImageUrl: url,
+            drugImageName: req.file.originalname
+        });
+        // save the document to the database
         await drug.save();
 
         res.status(201).json({ message: 'Drug created successfully' });
@@ -46,11 +58,14 @@ exports.updateDrug = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { name, dosage, price, store } = req.body;
+        const { name, dosage, price, quantityPerSachet, generalUsage, store } = req.body;
 
-        const storeDB = await Store.findOne({ name: store })
+        const storeDB = await Store.findOne({ name: store });
+ 
+        const url = new URL(req.file.path, `${req.protocol}://${req.get('host')}`).href
 
-        const drug = await Drug.findByIdAndUpdate(id, { name, dosage, price, store: storeDB }, { new: true });
+        // pass all updated fields to Drug.findByIdAndUpdate
+        const drug = await Drug.findByIdAndUpdate(id, { name, dosage, price, quantityPerSachet, generalUsage, store: storeDB, drugImageUrl: url, drugImageName: req.file.originalname }, { new: true });
 
         if (!drug) throw new Error('Drug not found');
 

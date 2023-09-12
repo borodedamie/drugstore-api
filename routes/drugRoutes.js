@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createDrug, getDrugs, getDrug, updateDrug, deleteDrug } = require('../controllers/drugController');
+const multer = require('multer');
 
 /**
 * @openapi
@@ -42,12 +43,18 @@ const { createDrug, getDrugs, getDrug, updateDrug, deleteDrug } = require('../co
 *                 type: string
 *               price:
 *                 type: number
-*               store:
+*               drugImageUrl:
 *                 type: string
+*               drugImageName:
+*                 type: string
+*               store:
+*                 type: object
 *             required:
 *               - name
 *               - dosage
 *               - price
+*               - drugImageUrl
+*               - drugImageName
 *               - store
 *     responses:
 *       201:
@@ -176,8 +183,24 @@ const { createDrug, getDrugs, getDrug, updateDrug, deleteDrug } = require('../co
 *                   type: string
 */
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/drugs')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10 MB
+    }
+});
+
 router.get('/store/:storeId', getDrugs)
-router.post('/', createDrug);
-router.route('/:id').get(getDrug).put(updateDrug).delete(deleteDrug);
+router.post('/', upload.single('drugImage'), createDrug);
+router.route('/:id').get(getDrug).put(upload.single('drugImage'), updateDrug).delete(deleteDrug);
 
 module.exports = router;

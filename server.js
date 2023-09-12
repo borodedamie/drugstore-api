@@ -76,6 +76,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session(sess))
 
+app.use('/uploads', express.static('uploads'))
+
 app.use(cors())
 
 // Routes

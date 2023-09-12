@@ -13,6 +13,10 @@ const drugSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    quantityPerSachet: { type: String },
+    generalUsage: { type: String },
+    drugImageUrl: { type: String },
+    drugImageName: { type: String },
     store: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Store',
