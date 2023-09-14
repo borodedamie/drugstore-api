@@ -14,9 +14,11 @@ const GoogleStrategy = require('passport-google-oidc').Strategy;
 const User = require('./models/userModel');
 const { swaggerDocs } = require('./utils/swagger');
 const cors = require('cors');
+const { checkAndCreateFolder } = require('./utils/uploadsDirs');
 
 global.socketIo = io(server);
 connectDB();
+checkAndCreateFolder('drugs');
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount)
