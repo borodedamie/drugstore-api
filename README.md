@@ -13,8 +13,6 @@
    - [Installation](#installation)
 2. [Features](#features)
 3. [Usage](#usage)
-4. [Contributing](#contributing)
-5. [License](#license)
 
 ## Getting Started
 
