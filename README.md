@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <strong>Welcome to the Online Pharmacy Locator and Delivery Service project!</strong>
+  <strong>Welcome to the RXPOINT Pharmacy Locator and Delivery Service project!</strong>
   <br />
   This platform is designed to provide a convenient way for users to order pharmaceutical products from nearby pharmacies and have them delivered to their doorstep.
 </p>
