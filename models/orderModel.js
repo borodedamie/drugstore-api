@@ -33,7 +33,6 @@ const orderSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        required: true,
         enum: [ 'processing', 'shipped', 'delivered' ],
         default: 'processing'
     },
@@ -43,16 +42,27 @@ const orderSchema = new mongoose.Schema({
         default: 'same day'
     },
     deliveryAddress: {
-        type: String,
-        required: true
+        type: String
     },
     deliveryTime: {
         type: Date
     },
     paymentMethod: {
         type: String,
-        required: true,
-        enum: [ 'cash', 'card' ]
+        enum: [ 'cash', 'card' ],
+        default: 'card'
+    },
+    subTotal: {
+        type: Number,
+        required: true
+    },
+    shippingFee: {
+        type: Number,
+        required: true
+    },
+    grandTotal: {
+        type: Number,
+        required: true
     },
     date: {
         type: Date,

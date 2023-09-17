@@ -21,10 +21,6 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
     },
-    orderHistory: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Order'
-    }],
     role: {
         type: String,
         default: "user",

@@ -17,7 +17,11 @@ const sendPushNotification = async (token, payload) => {
 
 exports.createOrder = async (req, res) => {
     try {
-        const { items, deliveryAddress, paymentMethod } = req.body;
+        const { items,
+            deliveryAddress,
+            subTotal,
+            shippingFee,
+            grandTotal } = req.body;
 
         const orderNumber = uuidv4();
 
@@ -25,10 +29,10 @@ exports.createOrder = async (req, res) => {
             orderNumber,
             user: req.user,
             items,
-            status: 'processing',
-            deliveryOption: 'same day',
             deliveryAddress,
-            paymentMethod
+            subTotal,
+            shippingFee,
+            grandTotal
         });
 
         await order.save();
@@ -64,20 +68,28 @@ exports.getOrders = async (req, res) => {
 
 exports.updateOrder = async (req, res) => {
     try {
-        const { orderNumber, status } = req.body;
+        const orderId = req.query.orderId;
 
-        const order = await Order.findOne({ orderNumber });
+        const order = await Order.findById(orderId);
         const user = order.user;
 
-        await Order.updateOne({ orderNumber }, { $set: { status } });
-  
-        socketIo.emit('order-status-updated', { orderNumber, status });
+        const oldStatus = order.status;
 
-        if (user.pushToken) {
+        await Order.updateOne({ _id: orderId }, { $set: req.body });
+
+        const newStatus = req.body.status;
+
+        // only emit the event if the status has changed
+        if (oldStatus !== newStatus) {
+            socketIo.emit('order-status-updated', { orderNumber: order.orderNumber, status: newStatus });
+        }
+
+        // only send the notification if the user has a pushToken and the status has changed
+        if (user.pushToken && oldStatus !== newStatus) {
             const payload = {
                 notification: {
                     title: 'Order status update',
-                    body: `Your order (${orderNumber}) status has been updated to ${status}.`,
+                    body: `Your order (${order.orderNumber}) status has been updated to ${newStatus}.`,
                     sound: 'default'
                 }
             };
@@ -85,7 +97,7 @@ exports.updateOrder = async (req, res) => {
             sendPushNotification(user.pushToken, payload);
         }
 
-        res.status(200).json({ message: 'Order status updated successfully' });
+        res.status(200).json({ message: 'Order updated successfully' });
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
