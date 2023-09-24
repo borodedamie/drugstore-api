@@ -15,6 +15,7 @@ const User = require('./models/userModel');
 const { swaggerDocs } = require('./utils/swagger');
 const cors = require('cors');
 const { checkAndCreateFolder } = require('./utils/uploadsDirs');
+const cookieParser = require('cookie-parser');
 
 global.socketIo = io(server);
 connectDB();
@@ -80,7 +81,16 @@ app.use(session(sess))
 
 app.use('/uploads', express.static('uploads'))
 
-app.use(cors())
+const allowedOrigins = ['http://localhost:8100', 'https://drugstore-geolocation-app.web.app', 'https://drugstore-geolocation-app.firebaseapp.com'];
+const corsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
+app.use(cookieParser());
 
 // Routes
 app.get('/', (req, res) => {

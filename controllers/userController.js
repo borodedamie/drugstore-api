@@ -2,12 +2,54 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const { transporter } = require('../config/nodemailer');
 
+function generateAccessToken(user) {
+    return jwt.sign(
+        { _id: user._id, email: user.email },
+        process.env.SECRET,
+        { expiresIn: '1800s' }
+    );
+}
+
+function generateRefreshToken(user) {
+    return jwt.sign(
+        { _id: user._id, email: user.email },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '90d' }
+    );
+}
+
+async function verifyRefreshToken(refreshToken, userId) {
+    try {
+        const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        if (payload._id !== userId) return false;
+
+        const user = await User.findOne({ _id: userId });
+        if (!user) return false;
+
+        // check if token matches the one in DB
+        if (refreshToken !== user.refreshToken) return false;
+
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
 exports.register = async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
-        const token = jwt.sign({ _id: user._id }, process.env.SECRET);
-        res.status(201).json({ token });
+
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        // save the refresh token
+        await User.updateOne({ _id: user._id }, { $set: { refreshToken } });
+
+        res.cookie('access_token', accessToken, { httpOnly: true, secure: true });
+        res.cookie('refresh_token', refreshToken, { httpOnly: true, secure: true });
+
+        res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -27,9 +69,16 @@ exports.login = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
-        const token = jwt.sign({ _id: user._id }, process.env.SECRET);
 
-        res.status(200).json({ token });
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        await User.updateOne({ _id: user._id }, { $set: { refreshToken } });
+
+        res.cookie('access_token', accessToken, { httpOnly: true, secure: false });
+        res.cookie('refresh_token', refreshToken, { httpOnly: true, secure: false });
+
+        res.status(200).json({ message: 'User logged in successfully' });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -37,15 +86,18 @@ exports.login = async (req, res) => {
 
 exports.profile = async (req, res) => {
     try {
-        if (!req.user) {
-            res.status(401).json({ error: 'Not authorized, no token' });
+        const user = req.user;
+        if (!user) {
+            // send an error message if no user is found
+            res.status(404).json({ error: 'User not found' });
         } else {
-            res.status(200).json(req.user);
+            res.status(200).json(user);
         }
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-}
+};
+
 
 exports.update = async (req, res) => {
     try {
@@ -155,5 +207,56 @@ exports.resetPassword = async (req, res) => {
         res.status(200).json({ message: 'Password reset successfully' });
     } catch (error) {
         res.status(400).json({ error: error.message });
+    }
+}
+
+// refresh token
+exports.refreshToken = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        const refreshToken = req.cookies.refresh_token;
+
+        // validate the refresh token
+        const isValid = await verifyRefreshToken(refreshToken, userId);
+        if (!isValid) {
+            return res.status(401).json({ error: 'Invalid token, try login again' });
+        }
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const accessToken = generateAccessToken(user);
+
+        res.cookie('access_token', accessToken, { httpOnly: true, secure: false });
+        res.status(200).json({ message: 'Access token refreshed' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
+exports.logout = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        const refreshToken = req.cookies.refresh_token;
+
+        // validate the refresh token
+        const isValid = await verifyRefreshToken(refreshToken, userId);
+        if (!isValid) {
+            return res.status(401).json({ error: 'Invalid token, try login again' });
+        }
+
+        const user = await User.findOne({ _id: userId });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        await User.updateOne({ _id: userId }, { $set: { refreshToken: null } });
+
+        res.cookie('access_token', '', { expires: new Date(0) });
+        res.cookie('refresh_token', '', { expires: new Date(0) });
+
+        res.json({ message: 'Logged out successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message })
     }
 }

@@ -12,6 +12,10 @@ const cartSchema = new mongoose.Schema({
             ref: 'Drug',
             required: true
         },
+        price: {
+            type: Number,
+            required: true
+        },
         quantity: {
             type: Number,
             required: true

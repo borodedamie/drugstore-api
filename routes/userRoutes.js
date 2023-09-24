@@ -1,6 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, profile, update, passwordReset, forgotPassword, resetPassword } = require('../controllers/userController');
+const { register, 
+        login, 
+        profile, 
+        update, 
+        passwordReset, 
+        forgotPassword, 
+        resetPassword, 
+        refreshToken, 
+        logout } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 const passport = require('passport');
 
@@ -62,6 +70,28 @@ const passport = require('passport');
 *         description: Bad Request.
 *       401:
 *         description: Invalid email or password, or User not found.
+*
+* /users/refresh-token:
+*  post:
+*    tags:
+*      - Refresh Token
+*    description: Refresh JWT token
+*    requestBody:
+*      required: true
+*      content:
+*        application/json:
+*          schema:
+*            type: object
+*            properties:
+*              userId:
+*                type: string
+*    responses:
+*      200:
+*        description: Access token refreshed!
+*      400:
+*        description: User not found.
+*      401:
+*        description: Invalid token, try login again
 *
 * /users/profile:
 *   post:
@@ -205,10 +235,12 @@ const passport = require('passport');
 
 router.post('/register', register);
 router.post('/login', login);
+router.post('/refresh-token', refreshToken);
 router.get('/profile', protect, profile);
 router.put('/update', protect, update);
 router.post('/request-password-reset', protect, forgotPassword);
 router.patch('/password-reset', resetPassword);
+router.post('/logout', logout);
 // router.post('/password-reset', passwordReset)
 
 router.get('/auth/facebook', passport.authenticate('facebook'));

@@ -20,7 +20,7 @@ exports.getCartItems = async (req, res) => {
 
 exports.addToCart = async (req, res) => {
     try {
-        const { storeId, drugId, quantity } = req.body;
+        const { storeId, drugId, quantity, price } = req.body;
 
         const store = await Store.findById(storeId);
         if (!store) {
@@ -41,10 +41,20 @@ exports.addToCart = async (req, res) => {
         if (!cart) {
             await Cart.create({
                 user: userId,
-                items: [{ drug: drugId, quantity }]
+                items: [{ drug: drugId, quantity, price }]
             });
         } else {
-            cart.items.push({ drug: drugId, quantity });
+            // Check if the item already exists in the cart
+            const itemIndex = cart.items.findIndex(item => item.drug.toString() === drugId);
+
+            if (itemIndex > -1) {
+                cart.items[itemIndex].quantity = quantity;
+                cart.items[itemIndex].price = price;
+            } else {
+                // If the item doesn't exist, add it to the cart
+                cart.items.push({ drug: drugId, quantity, price });
+            }
+
             await cart.save();
         }
 

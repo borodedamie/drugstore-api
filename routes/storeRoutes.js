@@ -150,10 +150,10 @@ const { protect } = require('../middleware/authMiddleware');
 */
 
 router.post('/register', registerStore);
-router.get('/', getStores);
+router.get('/', protect, getStores);
 router.patch('/update-drug-availability', protect, updateDrugAvailability);
-router.post('/add-drug', addDrug);
-router.delete('/remove-drug', removeDrug);
+router.post('/add-drug', protect, addDrug);
+router.delete('/remove-drug', protect, removeDrug);
 router.get('/directions', getETA);
 
 module.exports = router;
