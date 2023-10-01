@@ -26,14 +26,15 @@ checkAndCreateFolder('drugs');
 //   credential: admin.credential.cert(serviceAccount)
 // });
 
-const allowedOrigins = ['http://localhost:8100', 'https://drugstore-geolocation-app.web.app', 'https://drugstore-geolocation-app.firebaseapp.com' ];
-const corsOptions = {
-  origin: allowedOrigins,
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
+// const allowedOrigins = ['http://localhost:8100', 'https://drugstore-geolocation-app.web.app', 'https://drugstore-geolocation-app.firebaseapp.com' ];
+// const corsOptions = {
+//   origin: allowedOrigins,
+//   credentials: true,
+//   optionsSuccessStatus: 200,
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());
 
 var sess = {
   secret: process.env.EXPRESS_SESSION_SECRET_KEY,
