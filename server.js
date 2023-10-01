@@ -8,6 +8,7 @@ const io = require('socket.io');
 // const admin = require('firebase-admin');
 // const serviceAccount = require('./utils/drugstore-geolocation-app-firebase-adminsdk-7wv0k-6870466546.json')
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oidc').Strategy;
@@ -27,22 +28,32 @@ checkAndCreateFolder('drugs');
 
 var sess = {
   secret: process.env.EXPRESS_SESSION_SECRET_KEY,
-  cookie: {}
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+  }
 }
-
-app.use(
-  session({
-    secret: process.env.EXPRESS_SESSION_SECRET_KEY,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // Set to `true` if using HTTPS
-  })
-);
 
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy
   sess.cookie.secure = true // serve secure cookies
 }
+
+const store = new MongoDBStore({
+  uri: process.env.MONGO_URL,
+  collection: 'session',
+  ttl: 7 * 24 * 60 * 60, // 7 days in seconds
+})
+
+store.on('error', function(error) {
+  console.log(error);
+});
+
+app.use(session({
+  ...sess,
+  store: store
+}));
 
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
