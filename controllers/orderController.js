@@ -48,6 +48,17 @@ exports.createOrder = async (req, res) => {
         for (const storeId of storeIds) {
             const store = await Store.findById(storeId);
             socketIo.to(store.socketId).emit('place-order', { order });
+
+            // reduce the quantity of the drug in the availability array of the store
+            for (const item of items) {
+                for (const availability of store.availability) {
+                    if (availability.drug.toString() === item.drug.toString()) {
+                        availability.quantity -= item.quantity;
+                    }
+                }
+            }
+
+            await store.save();
         }
 
         res.status(201).json({ message: 'Order created successfully', order });
